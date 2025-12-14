@@ -465,49 +465,110 @@ class GtkUi:
 
     def on_test_ready(self):
         if self.device_combobox.get_active_id() is not None:
-            self.test_start_button.set_sensitive(True)
-        self.test_open_chart_button.set_sensitive(True)
-        self.test_export_csv_button.set_sensitive(True)
-        self.test_container_stack.set_visible_child(self.test_panel_results)
+            btn = getattr(self, 'test_start_button', None)
+            if btn:
+                btn.set_sensitive(True)
+        oc = getattr(self, 'test_open_chart_button', None)
+        if oc:
+            oc.set_sensitive(True)
+        ex = getattr(self, 'test_export_csv_button', None)
+        if ex:
+            ex.set_sensitive(True)
+        stack = getattr(self, 'test_container_stack', None)
+        panel = getattr(self, 'test_panel_results', None)
+        if stack and panel:
+            stack.set_visible_child(panel)
 
     def switch_test_panel(self, test_id):
-        self.test_panel_warning.set_visible(False)
-        self.test_panel_buttons.set_visible(False)
-        self.test_start_button.set_sensitive(False)
-        self.test_open_chart_button.set_sensitive(False)
-        self.test_export_csv_button.set_sensitive(False)
-        self.test_chart_window.hide()
+        panel_warn = getattr(self, 'test_panel_warning', None)
+        if panel_warn:
+            panel_warn.set_visible(False)
+        panel_buttons = getattr(self, 'test_panel_buttons', None)
+        if panel_buttons:
+            panel_buttons.set_visible(False)
+        btn = getattr(self, 'test_start_button', None)
+        if btn:
+            btn.set_sensitive(False)
+        oc = getattr(self, 'test_open_chart_button', None)
+        if oc:
+            oc.set_sensitive(False)
+        ex = getattr(self, 'test_export_csv_button', None)
+        if ex:
+            ex.set_sensitive(False)
+        chart_win = getattr(self, 'test_chart_window', None)
+        if chart_win:
+            chart_win.hide()
         if test_id is None:
-            self.test_container_stack.set_visible_child(self.test_panel_empty)
-            self.test_start_button.set_sensitive(True)
+            stack = getattr(self, 'test_container_stack', None)
+            panel_empty = getattr(self, 'test_panel_empty', None)
+            if stack and panel_empty:
+                stack.set_visible_child(panel_empty)
+            btn = getattr(self, 'test_start_button', None)
+            if btn:
+                btn.set_sensitive(True)
         elif test_id == 0:
-            self.test_container_stack.set_visible_child(self.test_panel_start1)
-            self.test_panel_buttons.set_visible(True)
-            self.test_panel_warning.set_visible(True)
-            self.test_panel_running1_ready.set_visible(True)
-            self.test_panel_running1_go.set_visible(False)
+            stack = getattr(self, 'test_container_stack', None)
+            panel = getattr(self, 'test_panel_start1', None)
+            if stack and panel:
+                stack.set_visible_child(panel)
+            if panel_buttons:
+                panel_buttons.set_visible(True)
+            if panel_warn:
+                panel_warn.set_visible(True)
+            r1 = getattr(self, 'test_panel_running1_ready', None)
+            if r1:
+                r1.set_visible(True)
+            g1 = getattr(self, 'test_panel_running1_go', None)
+            if g1:
+                g1.set_visible(False)
         elif test_id == 1:
-            self.test_container_stack.set_visible_child(self.test_panel_start2)
-            self.test_panel_buttons.set_visible(True)
-            self.test_panel_warning.set_visible(True)
+            stack = getattr(self, 'test_container_stack', None)
+            panel = getattr(self, 'test_panel_start2', None)
+            if stack and panel:
+                stack.set_visible_child(panel)
+            if panel_buttons:
+                panel_buttons.set_visible(True)
+            if panel_warn:
+                panel_warn.set_visible(True)
         elif test_id == 2:
-            self.test_container_stack.set_visible_child(self.test_panel_start3)
-            self.test_panel_buttons.set_visible(True)
-            self.test_panel_warning.set_visible(True)
+            stack = getattr(self, 'test_container_stack', None)
+            panel = getattr(self, 'test_panel_start3', None)
+            if stack and panel:
+                stack.set_visible_child(panel)
+            if panel_buttons:
+                panel_buttons.set_visible(True)
+            if panel_warn:
+                panel_warn.set_visible(True)
 
     def show_test_running(self, test_id, data = None):
-        self.test_panel_warning.set_visible(False)
-        self.test_panel_buttons.set_visible(False)
+        panel_warn = getattr(self, 'test_panel_warning', None)
+        if panel_warn:
+            panel_warn.set_visible(False)
+        panel_buttons = getattr(self, 'test_panel_buttons', None)
+        if panel_buttons:
+            panel_buttons.set_visible(False)
         if test_id == 0:
-            self.test_panel_running1_ready.set_visible(True)
-            self.test_panel_running1_go.set_visible(False)
+            r1 = getattr(self, 'test_panel_running1_ready', None)
+            if r1:
+                r1.set_visible(True)
+            g1 = getattr(self, 'test_panel_running1_go', None)
+            if g1:
+                g1.set_visible(False)
             if data is not None:
                 if data == 1:
-                    self.test_panel_running1_ready.set_visible(False)
-                    self.test_panel_running1_go.set_visible(True)
-            self.test_container_stack.set_visible_child(self.test_panel_running1)
+                    if r1:
+                        r1.set_visible(False)
+                    if g1:
+                        g1.set_visible(True)
+            stack = getattr(self, 'test_container_stack', None)
+            panel = getattr(self, 'test_panel_running1', None)
+            if stack and panel:
+                stack.set_visible_child(panel)
         elif test_id == 1:
-            self.test_container_stack.set_visible_child(self.test_panel_running)
+            stack = getattr(self, 'test_container_stack', None)
+            panel = getattr(self, 'test_panel_running', None)
+            if stack and panel:
+                stack.set_visible_child(panel)
         elif test_id == 2:
             self.test_container_stack.set_visible_child(self.test_panel_running)
 
