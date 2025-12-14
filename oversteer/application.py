@@ -37,6 +37,10 @@ class Application:
         parser.add_argument('--friction-level', type=int, help=_("set the friction level [0-100]"))
         parser.add_argument('--ffb-leds', action='store_true', default=None, help=_("enable FFBmeter leds"))
         parser.add_argument('--no-ffb-leds', dest='ffb_leds', action='store_false', default=None, help=_("disable FFBmeter leds"))
+        parser.add_argument('--freeze', nargs=2, action='append', metavar=('USAGE','VALUE'), help=_("freeze axis mapping: USAGE VALUE (can be repeated)"))
+        parser.add_argument('--freeze-clear', nargs=1, action='append', metavar=('USAGE',), help=_("clear frozen mapping for USAGE (can be repeated)"))
+        parser.add_argument('--freeze-disable', action='store_true', help=_("disable all frozen mappings"))
+        parser.add_argument('--freeze-list', action='store_true', help=_("list current frozen mappings"))
         parser.add_argument('--center-wheel', action='store_true', default=None, help=_("center wheel"))
         parser.add_argument('--no-center-wheel', dest='center_wheel', action='store_false', default=None, help=_("don't center wheel"))
         parser.add_argument('--start-manually', action='store_true', default=None, help=_("run command manually"))
@@ -125,6 +129,31 @@ class Application:
             model.set_ffb_leds(1 if args.ffb_leds else 0)
         if args.center_wheel is not None:
             model.set_center_wheel(1 if args.center_wheel else 0)
+
+        # Freeze axis handling (sysfs exposed by new-lg4ff)
+        if args.freeze_list:
+            mappings = model.get_freeze_mappings()
+            if mappings is None:
+                print(_("freeze_axis not supported on this device"))
+            else:
+                print("freeze mappings:")
+                for u, v in mappings:
+                    print(f"  {u} -> {v}")
+        if args.freeze is not None:
+            for usage, value in args.freeze:
+                try:
+                    model.add_freeze_mapping(int(usage), int(value))
+                except Exception:
+                    print(_("Invalid freeze parameters: {} {}".format(usage, value)))
+        if args.freeze_clear is not None:
+            for usage_list in args.freeze_clear:
+                try:
+                    usage = int(usage_list[0])
+                    model.remove_freeze_mapping(usage)
+                except Exception:
+                    print(_("Invalid freeze-clear parameter: {}".format(usage_list)))
+        if args.freeze_disable:
+            model.clear_freeze()
 
         if start_gui:
             self.args = args

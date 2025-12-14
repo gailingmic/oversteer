@@ -628,6 +628,14 @@ class GtkUi:
             self.btn_input[i] = self.builder.get_object('btn' + str(i) + '_input')
 
         self.profile_listbox = self.builder.get_object('profile_listbox')
+        # Freeze axis UI
+        self.freeze_listbox = self.builder.get_object('freeze_listbox')
+        self.freeze_usage_entry = self.builder.get_object('freeze_usage_entry')
+        self.freeze_value_entry = self.builder.get_object('freeze_value_entry')
+        self.freeze_add = self.builder.get_object('freeze_add')
+        self.freeze_clear = self.builder.get_object('freeze_clear')
+        self.freeze_clear_all = self.builder.get_object('freeze_clear_all')
+        self.freeze_refresh = self.builder.get_object('freeze_refresh')
 
         def sort_profiles(row1, row2):
             text1 = row1.get_children()[0].get_text().lower()
@@ -639,6 +647,39 @@ class GtkUi:
             return 0
 
         self.profile_listbox.set_sort_func(sort_profiles)
+
+    def set_freeze_mappings(self, mappings):
+        # Clear existing
+        for child in self.freeze_listbox.get_children():
+            self.freeze_listbox.remove(child)
+
+        if mappings is None:
+            label = Gtk.Label(label=_('freeze_axis not supported'))
+            label.set_xalign(0)
+            self.freeze_listbox.add(label)
+            label.show()
+            # disable inputs
+            self.freeze_usage_entry.set_sensitive(False)
+            self.freeze_value_entry.set_sensitive(False)
+            self.freeze_add.set_sensitive(False)
+            self.freeze_clear.set_sensitive(False)
+            self.freeze_clear_all.set_sensitive(False)
+            self.freeze_refresh.set_sensitive(False)
+            return
+
+        # enable inputs
+        self.freeze_usage_entry.set_sensitive(True)
+        self.freeze_value_entry.set_sensitive(True)
+        self.freeze_add.set_sensitive(True)
+        self.freeze_clear.set_sensitive(True)
+        self.freeze_clear_all.set_sensitive(True)
+        self.freeze_refresh.set_sensitive(True)
+
+        for u, v in mappings:
+            label = Gtk.Label(label=f"{u} → {v}")
+            label.set_xalign(0)
+            self.freeze_listbox.add(label)
+            label.show()
 
         self.test_container = self.builder.get_object('test_container')
         self.test_container_stack = self.builder.get_object('test_container_stack')

@@ -27,6 +27,11 @@ class GtkHandlers:
         return True
 
     def on_preferences_clicked(self, *args):
+        try:
+            mappings = self.model.get_freeze_mappings()
+            self.ui.set_freeze_mappings(mappings)
+        except Exception:
+            pass
         self.ui.preferences_window.show()
 
     def on_cancel_preferences_clicked(self, *args):
@@ -130,6 +135,54 @@ class GtkHandlers:
 
     def on_start_define_buttons_clicked(self, widget):
         self.controller.start_stop_button_setup()
+
+    # Freeze axis handlers
+    def on_freeze_add_clicked(self, widget):
+        try:
+            usage_text = self.ui.freeze_usage_entry.get_text()
+            value_text = self.ui.freeze_value_entry.get_text()
+            usage = int(usage_text)
+            value = int(value_text)
+            res = self.model.add_freeze_mapping(usage, value)
+            if not res:
+                self.ui.error_dialog(_('Unable to set freeze mapping'))
+            else:
+                self.on_freeze_refresh_clicked(None)
+        except ValueError:
+            self.ui.error_dialog(_('Invalid numbers for usage/value'))
+        except Exception as e:
+            self.ui.error_dialog(_('Error setting freeze mapping'), str(e))
+
+    def on_freeze_clear_clicked(self, widget):
+        try:
+            usage_text = self.ui.freeze_usage_entry.get_text()
+            usage = int(usage_text)
+            res = self.model.remove_freeze_mapping(usage)
+            if not res:
+                self.ui.error_dialog(_('Unable to clear freeze mapping'))
+            else:
+                self.on_freeze_refresh_clicked(None)
+        except ValueError:
+            self.ui.error_dialog(_('Invalid usage number'))
+        except Exception as e:
+            self.ui.error_dialog(_('Error clearing freeze mapping'), str(e))
+
+    def on_freeze_clear_all_clicked(self, widget):
+        try:
+            res = self.model.clear_freeze()
+            if not res:
+                self.ui.error_dialog(_('Unable to clear all freeze mappings'))
+            else:
+                self.on_freeze_refresh_clicked(None)
+        except Exception as e:
+            self.ui.error_dialog(_('Error clearing freeze mappings'), str(e))
+
+    def on_freeze_refresh_clicked(self, widget):
+        try:
+            mappings = self.model.get_freeze_mappings()
+            self.ui.set_freeze_mappings(mappings)
+        except Exception as e:
+            self.ui.error_dialog(_('Error reading freeze mappings'), str(e))
 
     def on_wheel_buttons_state_set(self, widget, state):
         self.model.set_use_buttons(state)

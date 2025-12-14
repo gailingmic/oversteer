@@ -329,6 +329,59 @@ class Device:
             file.write(peak_ffb_level)
         return True
 
+    # --- freeze_axis support (new-lg4ff sysfs) ---
+    def get_freeze_mappings(self):
+        """Return list of (usage, value) mappings or empty list if not supported."""
+        path = self.checked_device_file('freeze_axis')
+        if not path:
+            return None
+        with open(path, 'r') as file:
+            data = file.read()
+        lines = data.splitlines()
+        mappings = []
+        for line in lines:
+            parts = line.strip().split()
+            if len(parts) >= 2:
+                try:
+                    u = int(parts[0])
+                    v = int(parts[1])
+                    mappings.append((u, v))
+                except ValueError:
+                    continue
+        return mappings
+
+    def set_freeze_mapping(self, usage, value):
+        """Add or update a frozen mapping: write '<usage> <value>' to sysfs."""
+        path = self.checked_device_file('freeze_axis')
+        if not path:
+            return False
+        cmd = f"{int(usage)} {int(value)}\n"
+        logging.debug("Setting freeze mapping: %s", cmd.strip())
+        with open(path, 'w') as file:
+            file.write(cmd)
+        return True
+
+    def clear_freeze_usage(self, usage):
+        """Clear a specific frozen usage: write 'clear <usage>' to sysfs."""
+        path = self.checked_device_file('freeze_axis')
+        if not path:
+            return False
+        cmd = f"clear {int(usage)}\n"
+        logging.debug("Clearing freeze usage: %s", cmd.strip())
+        with open(path, 'w') as file:
+            file.write(cmd)
+        return True
+
+    def clear_freeze_all(self):
+        """Disable all frozen mappings: write 'none' or '0' to sysfs."""
+        path = self.checked_device_file('freeze_axis')
+        if not path:
+            return False
+        logging.debug("Clearing all freeze mappings")
+        with open(path, 'w') as file:
+            file.write('none\n')
+        return True
+
     def center_wheel(self):
         self.set_autocenter(100)
         time.sleep(1)

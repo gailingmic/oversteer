@@ -263,6 +263,27 @@ class Model:
     def get_start_app_manually(self):
         return self.data['start_app_manually']
 
+    # --- freeze_axis helpers ---
+    def get_freeze_mappings(self):
+        if not self.device:
+            return None
+        return self.device.get_freeze_mappings()
+
+    def add_freeze_mapping(self, usage, value):
+        if not self.device:
+            return False
+        return self.device.set_freeze_mapping(usage, value)
+
+    def remove_freeze_mapping(self, usage):
+        if not self.device:
+            return False
+        return self.device.clear_freeze_usage(usage)
+
+    def clear_freeze(self):
+        if not self.device:
+            return False
+        return self.device.clear_freeze_all()
+
     def flush_device(self):
         logging.debug("flush_device")
         if self.data['mode'] is not None:
